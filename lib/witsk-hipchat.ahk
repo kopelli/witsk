@@ -6,7 +6,7 @@ CreateSettings(iniFile)
     @name = HipChat
     @sectionName = %@name%_Shortcuts
 
-    IniWrite, HipChat ahk_class Qt5qWindowIcon, %iniFile%, %@name%, WinTitle
+    IniWrite, HipChat ahk_class Qt5QWindowIcon, %iniFile%, %@name%, WinTitle
 
     IniWrite, Invite someone to a room, %iniFile%, %@sectionName%, CTRL+I
     IniWrite, Join a new room or 1-1 chat, %iniFile%, %@sectionName%, CTRL+J
