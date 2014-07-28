@@ -49,17 +49,19 @@ GetAllLibraries(iniFilePath)
         ; We only care about those sections that end in "_Shortcuts"
         If (RegExMatch(A_LoopField, "_Shortcuts$") > 0)
         {
+            @_shortcutsSection := A_LoopField
             @_libraryCommands := Object()
             @actualSection := SubStr(A_LoopField, 1, StrLen(A_LoopField)-StrLen("_Shortcuts"))
             ; Loop through all the key-value pairs of the shortcuts section
-            IniRead, @shortCuts, %iniFilePath%, %A_LoopField%
+            IniRead, @shortCuts, %iniFilePath%, %@_shortcutsSection%
             Loop, Parse, @shortCuts, `n
             {
-                @_key := SubStr(A_LoopField, 1, InStr(A_LoopField, "=")-1)
-                @_value := SubStr(A_LoopField, StrLen(@_key)+2)
+                @_shortcutLine := A_LoopField
+                @_key := SubStr(@_shortcutLine, 1, InStr(@_shortcutLine, "=")-1)
+                @_value := SubStr(@_shortcutLine, StrLen(@_key)+2)
                 @_libraryCommands[@_key] := @_value
             }
-            IniRead, @_windowTitle, %iniFilePath%, %@actualSection%, "WinTitle", %A_Space%
+            IniRead, @_windowTitle, %iniFilePath%, %@actualSection%, WinTitle, %A_Space%
             @_allLibraries[@_windowTitle] := @_libraryCommands
         }
     }
@@ -92,17 +94,16 @@ WhatIsThatShortcutKey(commands)
 
     Gui, Show, AutoSize NoActivate, ~~WHAT~IS~THAT~SHORTCUT~KEY~~MAIN~~WINDOW~~
     WinSet, Transparent, 230, ~~WHAT~IS~THAT~SHORTCUT~KEY~~MAIN~~WINDOW~~
+    WinSet, AlwaysOnTop, On, ~~WHAT~IS~THAT~SHORTCUT~KEY~~MAIN~~WINDOW~~ 
 }
 
 ; =============================================================================
 ; Hotkeys
 ; =============================================================================
 $^?::
-    @activeWindowId := WinActive("A")
     For @_winTitle, @_winCommands in AllLibraries
     {
-        @queriedWindowId := WinActive(@_winTitle)
-        If (@activeWindowId = @queriedWindowId)
+        If (WinActive(@_winTitle))
         {
             WhatIsThatShortcutKey(@_winCommands)
         }
